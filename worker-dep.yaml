@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:
+      containers:
+        - name: worker
+          image: venkat1793/multi-worker
+          env:
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: worker-config-map
+                  key: redis_port
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: worker-config-map
+                  key: redis_host

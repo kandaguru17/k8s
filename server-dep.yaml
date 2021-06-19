@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: venkat1793/multi-server
+          env:
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: worker-config-map
+                  key: redis_port
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: worker-config-map
+                  key: redis_host
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: pg_root_username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: pg_root_password
+            - name: PGHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: server-config-map
+                  key: pg_host
+            - name: PGPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: server-config-map
+                  key: pg_port
+            - name: PGDATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: server-config-map
+                  key: pg_database
+          ports:
+            - containerPort: 5000
